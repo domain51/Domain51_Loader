@@ -36,7 +36,7 @@ class Domain51_Loader
      */
     public function loadClass($class_name)
     {
-        $file = str_replace('_', '/', $class_name) . '.php';
+        $file = str_replace('_', DIRECTORY_SEPARATOR, $class_name) . '.php';
         include_once $file;
     }
     
