@@ -26,7 +26,7 @@
 class Domain51_Loader
 {
     private static $_instance = null;
-    private static $_filename = '';
+    private $_filename = '';
     
     /**
      * Handle instantiation
@@ -44,19 +44,47 @@ class Domain51_Loader
     }
     
     /**
-     * Loads a class from within the include_path provided the class follows PEAR naming
-     * conventions.
+     * Static utility method for loading a class and checking to insure it was loaded
      *
-     * @internal include_once is used to keep from halting the system while still insuring that no
-     *           subsequent calls to an already included file are made.
      *
      * @param string $class_name Class to load
+     *
+     * @throws Domain51_Loader_UnknownClassException if the class is not located
      */
     public function loadClass($class_name)
     {
-        self::$_filename = str_replace('_', DIRECTORY_SEPARATOR, $class_name) . '.php';
+        @self::getInstance()->loadClassWithoutCheck($class_name);
+        if (!class_exists($class_name)) {
+            throw new Domain51_Loader_UnknownClassException(
+                "Unable to locate class {$class_name}"
+            );
+        }
+    }
+    
+    /**
+     * Loads a class from within the include_path provided the class follows PEAR naming
+     * conventions.
+     *
+     * This provides no check to see if the class requested is already loaded or if the class was
+     * successfully loaded.  If that functionality is required, use the static
+     * {@link Domain51_Loader::loadClass()} method.
+     *
+     * This method should rarely be used directly, but is provided as a public method for those
+     * requiring it.  This method must be invoked on an instance of Domain51_Loader, either directly
+     * instantiated, or through {@link Domain51_Loader::getInstance()}.
+     *
+     * @internal include_once is used to keep from halting the system while still insuring that no
+     *           subsequent calls to an already included file are made.  This allows a developer
+     *           to surpress the error message in cases where it is warranted (such as the SPL
+     *           autoload registry).
+     *
+     * @param string $class_name Class to load
+     */
+    public function loadClassWithoutCheck($class_name)
+    {
+        $this->_filename = str_replace('_', DIRECTORY_SEPARATOR, $class_name) . '.php';
         unset($class_name);
-        include_once self::$_filename;
+        include_once $this->_filename;
     }
     
     
@@ -84,9 +112,11 @@ class Domain51_Loader
      */
     public static function autoload($class_name)
     {
-        @self::getInstance()->loadClass($class_name);
+        @self::getInstance()->loadClassWithoutCheck($class_name);
     }
 }
+
+class Domain51_Loader_UnknownClassException extends Exception { }
 
 /**
  * Register with autoload stack
