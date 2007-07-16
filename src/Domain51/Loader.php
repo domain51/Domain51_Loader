@@ -26,6 +26,7 @@
 class Domain51_Loader
 {
     private static $_instance = null;
+    private static $_filename = '';
     
     /**
      * Handle instantiation
@@ -53,7 +54,9 @@ class Domain51_Loader
      */
     public function loadClass($class_name)
     {
-        include_once str_replace('_', DIRECTORY_SEPARATOR, $class_name) . '.php';
+        self::$_filename = str_replace('_', DIRECTORY_SEPARATOR, $class_name) . '.php';
+        unset($class_name);
+        include_once self::$_filename;
     }
     
     
