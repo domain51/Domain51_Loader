@@ -1,10 +1,27 @@
 <?php
+/**
+ * This file provides {@link Domain51_Loader}
+ *
+ * @package Domain51_Loader
+ * @author Travis Swicegood <development@domain51.com>
+ * @version Release: @@VERSION@@
+ * @copyright 2007, Domain51
+ * @license http://www.gnu.org/licenses/lgpl.html LGPL
+ */
 
 /**
  * Provides a simple mechanism for load classes that use the PEAR naming convention.
  *
- * This hooks into the spl_autoload functionality of PHP to allow add itself to the stack of
- * autoloaders that have already been defined.
+ * This hooks into the spl_autoload functionality of PHP to add itself to the stack of
+ * autoloaders that have already been defined.  By using Domain51_Loader::autoload(), errors are
+ * surpressed allowing this loader to exist in a chain of loaders.
+ *
+ * @package Domain51_Loader
+ * @author Travis Swicegood <development@domain51.com>
+ * @version Release: @@VERSION@@
+ * @copyright 2007, Domain51
+ * @license http://www.gnu.org/licenses/lgpl.html LGPL
+ * @since v0.1
  */
 class Domain51_Loader
 {
