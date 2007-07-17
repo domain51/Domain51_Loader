@@ -44,6 +44,32 @@ class Domain51_Loader
     }
     
     /**
+     * Loads a class from within the include_path provided the class follows PEAR naming
+     * conventions.
+     *
+     * This provides no check to see if the class requested is already loaded or if the class was
+     * successfully loaded.  If that functionality is required, use the static
+     * {@link Domain51_Loader::loadClass()} method.
+     *
+     * This method should rarely be used directly, but is provided as a public method for those
+     * requiring it.  This method must be invoked on an instance of Domain51_Loader, either directly
+     * instantiated, or through {@link Domain51_Loader::getInstance()}.
+     *
+     * @internal include_once is used to keep from halting the system while still insuring that no
+     *           subsequent calls to an already included file are made.  This allows a developer
+     *           to surpress the error message in cases where it is warranted (such as the SPL
+     *           autoload registry).
+     *
+     * @param string $class_name Class to load
+     */
+    public function loadClassWithoutCheck($class_name)
+    {
+        $this->_filename = str_replace('_', DIRECTORY_SEPARATOR, $class_name) . '.php';
+        unset($class_name);
+        include_once $this->_filename;
+    }
+    
+    /**
      * Static utility method for loading a class and checking to insure it was loaded
      *
      *
@@ -73,33 +99,6 @@ class Domain51_Loader
     }
     
     /**
-     * Loads a class from within the include_path provided the class follows PEAR naming
-     * conventions.
-     *
-     * This provides no check to see if the class requested is already loaded or if the class was
-     * successfully loaded.  If that functionality is required, use the static
-     * {@link Domain51_Loader::loadClass()} method.
-     *
-     * This method should rarely be used directly, but is provided as a public method for those
-     * requiring it.  This method must be invoked on an instance of Domain51_Loader, either directly
-     * instantiated, or through {@link Domain51_Loader::getInstance()}.
-     *
-     * @internal include_once is used to keep from halting the system while still insuring that no
-     *           subsequent calls to an already included file are made.  This allows a developer
-     *           to surpress the error message in cases where it is warranted (such as the SPL
-     *           autoload registry).
-     *
-     * @param string $class_name Class to load
-     */
-    public function loadClassWithoutCheck($class_name)
-    {
-        $this->_filename = str_replace('_', DIRECTORY_SEPARATOR, $class_name) . '.php';
-        unset($class_name);
-        include_once $this->_filename;
-    }
-    
-    
-    /**
      * Returns a Singleton copy of this object
      *
      * @return Domain51_Loader
@@ -127,6 +126,9 @@ class Domain51_Loader
     }
 }
 
+/**
+ * The exception thrown by {@link Domain51_Loader::loadClass()} when a class is not found.
+ */
 class Domain51_Loader_UnknownClassException extends Exception { }
 
 /**
