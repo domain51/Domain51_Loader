@@ -14,6 +14,6 @@ $object = new Domain51_SomeObject();
 ?>
 ===DONE===
 --CLEAN--
-<?php @unlink(dirname(__FILE__) . '/../../support/Domain51/Loader.php'); ?>
+<?php @unlink(dirname(__FILE__) . '/support/Domain51/Loader.php'); ?>
 --EXPECT--
 ===DONE===
