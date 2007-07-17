@@ -1,0 +1,13 @@
+<?php
+
+function __autoload($class_name)
+{
+    echo "__autoload({$class_name})\n";
+}
+
+// sanity check
+$random = rand(10, 20);
+ob_start();
+__autoload("SomeClass_{$random}");
+$buffer = ob_get_clean();
+assert('$buffer = "__autoload(SomeClass_$random)\n"');

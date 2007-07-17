@@ -130,6 +130,16 @@ class Domain51_Loader
 class Domain51_Loader_UnknownClassException extends Exception { }
 
 /**
+ * If __autoload() exists and is not registered with the SPL autoload functionality,
+ * add it to the list in front of Domain51_Loader::autoload()
+ *
+ * @ignore
+ */
+if (function_exists('__autoload')) {
+    spl_autoload_register('__autoload');
+}
+
+/**
  * Register with autoload stack
  * @ignore
  */
