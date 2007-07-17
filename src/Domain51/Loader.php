@@ -49,16 +49,27 @@ class Domain51_Loader
      *
      * @param string $class_name Class to load
      *
+     * @return true|null  Returns true if the class was successfully loaded, or null if the class
+     *                    already exists.
+     *
      * @throws Domain51_Loader_UnknownClassException if the class is not located
+     *
+     * @see Domain51_Loader::getInstance(), Domain51_Loader::loadClassWithoutCheck()
      */
     public function loadClass($class_name)
     {
+        if (class_exists($class_name, false)) {
+            return null;
+        }
+        
         @self::getInstance()->loadClassWithoutCheck($class_name);
-        if (!class_exists($class_name)) {
+        if (!class_exists($class_name, false)) {
             throw new Domain51_Loader_UnknownClassException(
                 "Unable to locate class {$class_name}"
             );
         }
+        
+        return true;
     }
     
     /**
