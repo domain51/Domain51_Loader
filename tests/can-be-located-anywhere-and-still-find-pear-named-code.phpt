@@ -6,8 +6,8 @@ include_path set.
 <?php
 set_include_path('');
 
-$path = dirname(__FILE__) . '/../../support';
-copy(dirname(__FILE__) . '/../../../src/Domain51/Loader.php', "{$path}/Domain51/Loader.php");
+$path = dirname(__FILE__) . '/support';
+copy(dirname(__FILE__) . '/../src/Domain51/Loader.php', "{$path}/Domain51/Loader.php");
 
 require_once "{$path}/Domain51/Loader.php";
 $object = new Domain51_SomeObject();
