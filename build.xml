@@ -31,10 +31,13 @@
             <name>Domain51_Loader</name>
             <summary>Provides a generic class loader that hooks into SPL's autoload functionality</summary>
             <channel>pear.domain51.com</channel>
-            <description>
-                This packages provides a simple, fully-tested class loader that automatically
-                hooks itself into SPL's autoload functionality while playing well with
-                existing __autoload() functions.
+            <description indentions_to_remove="16">
+                <!--        Don't exceed this width         -->
+                This packages provides a simple, fully-tested
+                class loader that automatically hooks itself
+                into SPL's autoload functionality while
+                playing well with existing __autoload()
+                functions.
             </description>
             
             <lead user="tswicegood" name="Travis Swicegood" email="developer@domain51.com" />
