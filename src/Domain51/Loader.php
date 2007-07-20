@@ -3,7 +3,6 @@
  * This file provides {@link Domain51_Loader}
  *
  * @package Domain51_Loader
- * @author Travis Swicegood <development@domain51.com>
  * @version Release: @@VERSION@@
  * @copyright 2007, Domain51
  * @license http://www.gnu.org/licenses/lgpl.html LGPL
@@ -17,9 +16,8 @@
  * surpressed allowing this loader to exist in a chain of loaders.
  *
  * @package Domain51_Loader
- * @author Travis Swicegood <development@domain51.com>
  * @version Release: @@VERSION@@
- * @copyright 2007, Domain51
+ * @copyright 2007, Travis Swicegood, PEAR Group
  * @license http://www.gnu.org/licenses/lgpl.html LGPL
  * @since v0.1
  */
@@ -27,19 +25,41 @@ class Domain51_Loader
 {
     private static $_instance = null;
     private $_filename = '';
+    private $_paths = null;
+    private $_temp_paths = null;
     
     /**
      * Handle instantiation
+     *
+     * This is provided to allow use of the Domain51_Loader class within another object
+     * without having to rely concretely on this class.
+     *
+     * @param string $include_path
+     *     If provided, this series of paths will function as the include_path for all subsequent
+     *     calls to {@link loadClass()} and {@link loadClassWithoutCheck()}.  If null, the current
+     *     get_include_path() is assumed.
+     *
+     * @see Domain51_Loader::getInstance()
      */
-    public function __construct()
+    public function __construct($include_path = null)
     {
-        $include_path = explode(PATH_SEPARATOR, get_include_path());
+        $custom_path = !is_null($include_path);
+        $include_path = explode(
+            PATH_SEPARATOR,
+            $custom_path ? $include_path : get_include_path() 
+        );
+        
+        
         $path = realpath(dirname(dirname(__FILE__)));
         if (!in_array($path, $include_path)) {
-            set_include_path(
-                $path . PATH_SEPARATOR .
-                get_include_path()
-            );
+            if ($custom_path) {
+                $this->_paths = $path . PATH_SEPARATOR . implode(PATH_SEPARATOR, $include_path);
+            } else {
+                set_include_path(
+                    $path . PATH_SEPARATOR .
+                    implode(PATH_SEPARATOR, $include_path)
+                );
+            }
         }
     }
     
@@ -64,9 +84,20 @@ class Domain51_Loader
      */
     public function loadClassWithoutCheck($class_name)
     {
+        // if a custom include_path was provided at instantiation, use it temporarily
+        if (isset($this->_paths)) {
+            $this->_temp_paths = get_include_path();
+            set_include_path($this->_paths);
+        }
+        
         $this->_filename = str_replace('_', DIRECTORY_SEPARATOR, $class_name) . '.php';
         unset($class_name);
         include_once $this->_filename;
+        
+        // revert the custom include_path, if used
+        if (isset($this->_paths)) {
+            set_include_path($this->_temp_paths);
+        }
     }
     
     /**
@@ -88,7 +119,12 @@ class Domain51_Loader
             return null;
         }
         
-        @self::getInstance()->loadClassWithoutCheck($class_name);
+        if (isset($this) && $this instanceof Domain51_Loader) {
+            $this->loadClassWithoutCheck($class_name);
+        } else {
+            @self::getInstance()->loadClassWithoutCheck($class_name);
+        }
+        
         if (!class_exists($class_name, false)) {
             throw new Domain51_Loader_UnknownClassException(
                 "Unable to locate class {$class_name}"
@@ -100,6 +136,8 @@ class Domain51_Loader
     
     /**
      * Returns a Singleton copy of this object
+     *
+     * Note that getInstance() assumes you will be using the include_path to search for classes.
      *
      * @return Domain51_Loader
      */
